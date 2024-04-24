@@ -35,3 +35,40 @@ def list_wines():
             print("-" * 60)
     except FileNotFoundError:
         print("No wines found. Please register some wines first.")
+
+
+def update_wine(code, new_name=None, new_type=None, new_alcohol_content=None, new_price=None):
+    try:
+        with open("data/wines.txt", "r") as file:
+            wines = file.readlines()
+
+        wine_index = None
+        for index, wine in enumerate(wines):
+            if wine.split(",")[0] == code:
+                wine_index = index
+                break
+
+        if wine_index is not None:
+            current_wine = wines[wine_index].strip().split(",")
+
+            if new_name:
+                current_wine[1] = new_name
+            if new_type:
+                current_wine[2] = new_type
+            if new_alcohol_content:
+                current_wine[3] = new_alcohol_content
+            if new_price:
+                current_wine[4] = new_price
+
+            updated_wine = ",".join(current_wine) + "\n"
+
+            wines[wine_index] = updated_wine
+
+            with open("data/wines.txt", "w") as file:
+                file.writelines(wines)
+
+            print("Wine updated successfully!")
+        else:
+            print("Wine not found with the provided code.")
+    except FileNotFoundError:
+        print("No wines found. Please register some wines first.")

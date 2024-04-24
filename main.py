@@ -9,7 +9,9 @@ def main():
             menu.register_wine()
         elif option == "2":
             menu.list_wines()
-        elif option == "3":
+        elif option == "2":
+            menu.update_wine()
+        elif option == "4":
             print("Exiting the program...")
             break
 
