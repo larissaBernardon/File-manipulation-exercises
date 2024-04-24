@@ -7,13 +7,21 @@ class Wine:
         self.price = price
 
 def register_wine():
-    code = input("Enter the code of the wine: ")
-    name = input("Enter the name of the wine: ")
-    type = input("Enter the type of the wine: ")
-    alcohol_content = float(input("Enter the alcohol content of the wine: "))
-    price = float(input("Enter the price of the wine: "))
-    wine = Wine(name, type, alcohol_content, price)
-    print("Wine registered successfully!")
+    try:
+        code = input("Enter the code of the wine: ")
+        name = input("Enter the name of the wine: ")
+        wine_type = input("Enter the type of the wine: ")
+        alcohol_content = float(input("Enter the alcohol content of the wine: "))
+        price = float(input("Enter the price of the wine: "))
+
+        new_wine = f"{code},{name},{wine_type},{alcohol_content},{price}"
+
+        with open("data/wines.txt", "a") as file:
+            file.write(new_wine + "\n")
+
+        print("Wine registered successfully!")
+    except ValueError:
+        print("Invalid input. Please enter a valid number for alcohol content and price.")
 
 def list_wines():
     wines = [
