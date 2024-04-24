@@ -24,11 +24,14 @@ def register_wine():
         print("Invalid input. Please enter a valid number for alcohol content and price.")
 
 def list_wines():
-    wines = [
-        Wine("Wine 1", "Red", 12.5, 25.0),
-        Wine("Wine 2", "White", 10.0, 20.0),
-        Wine("Wine 3", "Rosé", 11.0, 18.0)
-    ]
-    print("Registered wines:")
-    for index, wine in enumerate(wines, start=1):
-        print(f"{index}. {wine.name} ({wine.type}) - Alcohol: {wine.alcohol_content}%, Price: ${wine.price}")
+    try:
+        with open("data/wines.txt", "r") as file:
+            print("=== List of Wines ===")
+            print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
+            print("-" * 60)
+            for line in file:
+                code, name, wine_type, alcohol_content, price = line.strip().split(",")
+                print(f"{code}\t{name.ljust(20)}\t{wine_type}\t{alcohol_content}%\t\tR${price}")
+            print("-" * 60)
+    except FileNotFoundError:
+        print("No wines found. Please register some wines first.")

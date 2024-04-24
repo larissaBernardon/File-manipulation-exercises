@@ -1,3 +1,5 @@
+from source import wine
+
 def display_menu():
     print("=== Menu ===")
     print("1. Register a new wine")
@@ -13,7 +15,7 @@ def get_choice():
             print("Invalid option. Please choose a valid option.")
 
 def register_wine():
-    print("Option to register a new wine selected.")
+    wine.register_wine()
 
 def list_wines():
-    print("Option to list registered wines selected.")
+    wine.list_wines()
