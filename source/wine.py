@@ -102,3 +102,44 @@ def update_wine(code, new_name=None, new_type=None, new_alcohol_content=None, ne
             print("Wine not found with the provided code.")
     except FileNotFoundError:
         print("No wines found. Please register some wines first.")
+
+
+def delete_wine(code):
+    try:
+        if not file_exists("data/wines.txt"):
+            print("File 'data/wines.txt' does not exist.")
+            return
+        
+        with open("data/wines.txt", "r") as file:
+            wines = file.readlines()
+
+        wine_found = False
+        for index, wine in enumerate(wines):
+            if wine.split(",")[0] == code:
+                wine_found = True
+                wine_info = wine.strip().split(",")
+                print("=== Wine Found ===")
+                print("Code:", wine_info[0])
+                print("Name:", wine_info[1])
+                print("Type:", wine_info[2])
+                print("Alcohol Content:", wine_info[3])
+                print("Price:", wine_info[4])
+                while True:
+                    confirmation = input("Are you sure you want to delete this wine? (1 - Yes, 2 - No): ")
+                    if confirmation == "1":
+                        wines[index] = "" 
+                        with open("data/wines.txt", "w") as file:
+                            file.writelines(wines)
+                        print("Wine deleted successfully!")
+                        break
+                    elif confirmation == "2":
+                        print("Deletion canceled.")
+                        break
+                    else:
+                        print("Invalid input. Please enter 1 for Yes or 2 for No.")
+                break
+
+        if not wine_found:
+            print("Wine not found with the provided code.")
+    except FileNotFoundError:
+        print("No wines found. Please register some wines first.")
