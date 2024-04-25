@@ -1,3 +1,4 @@
 101041,Merlot,Red,13.5,25.00
 102345,Chardonnay,White,12.0,20.00
-103908,Cabernet Sauvignon,Red,14.0,30.00
+12345,Merlot,Red,15.0,19.00
+32412,Chardonnay,White,23.0,40.00

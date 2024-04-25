@@ -9,9 +9,13 @@ def main():
             menu.register_wine()
         elif option == "2":
             menu.list_wines()
-        elif option == "2":
+        elif option == "3":
             menu.update_wine()
         elif option == "4":
+            menu.delete_wine()
+        elif option == "5":
+            menu.search_wine()
+        elif option == "6":
             print("Exiting the program...")
             break
 

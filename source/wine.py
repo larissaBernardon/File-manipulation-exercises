@@ -35,32 +35,21 @@ def register_wine():
 
 def list_wines():
     try:
-        if not file_exists("data/wines.txt"):
-            print("File 'data/wines.txt' does not exist.")
-            return
-        
         with open("data/wines.txt", "r") as file:
             print("=== List of Wines ===")
             print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
             print("-" * 60)
-
-            total_items = 0
-            total_alcohol_content = 0
-            total_price = 0
-
             for line in file:
-                code, name, wine_type, alcohol_content, price = line.strip().split(",")
-                total_items += 1
-                total_alcohol_content += float(alcohol_content)
-                total_price += float(price)
-                print(f"{code}\t{name.ljust(20)}\t{wine_type}\t{alcohol_content}%\t\tR${price}")
-
+                wine_data = line.strip().split(",")
+                if len(wine_data) >= 5:
+                    code, name, wine_type, alcohol_content, price = wine_data[:5]
+                    print(f"{code}\t{name.ljust(20)}\t{wine_type}\t{alcohol_content}%\t\tR${price}")
+                else:
+                    print(f"Invalid data: {line.strip()}")
             print("-" * 60)
-            print(f"Total items: {total_items}")
-            print(f"Average alcohol content: {total_alcohol_content / total_items}%")
-            print(f"Total price: R${total_price}")
     except FileNotFoundError:
         print("No wines found. Please register some wines first.")
+
 
 
 def update_wine(code, new_name=None, new_type=None, new_alcohol_content=None, new_price=None):
@@ -141,5 +130,36 @@ def delete_wine(code):
 
         if not wine_found:
             print("Wine not found with the provided code.")
+    except FileNotFoundError:
+        print("No wines found. Please register some wines first.")
+
+
+def search_wine(value):
+    try:
+        if not file_exists("data/wines.txt"):
+            print("File 'data/wines.txt' does not exist.")
+            return
+        
+        search_results = []
+        with open("data/wines.txt", "r") as file:
+            for line in file:
+                try:
+                    code, name, wine_type, alcohol_content, price = line.strip().split(",")
+                    if value.lower() in (name.lower(), wine_type.lower()):
+                        search_results.append((code, name, wine_type, alcohol_content, price))
+                    elif value.isdigit() and any(field == float(value) for field in (alcohol_content, price)):
+                        search_results.append((code, name, wine_type, alcohol_content, price))
+                except ValueError:
+                    pass
+
+        if search_results:
+            print("=== Search Results ===")
+            print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
+            print("-" * 60)
+            for result in search_results:
+                print("\t".join(result))
+            print("-" * 60)
+        else:
+            print("No wines found matching the search criteria.")
     except FileNotFoundError:
         print("No wines found. Please register some wines first.")
