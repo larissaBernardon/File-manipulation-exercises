@@ -8,158 +8,111 @@ class Wine:
         self.alcohol_content = alcohol_content
         self.price = price
 
-def file_exists(file_path):
-    return os.path.exists(file_path)
+    def __str__(self):
+        return f"{self.code}\t{self.name.ljust(20)}\t{self.type}\t{self.alcohol_content}%\t\tR${self.price}"
 
+# Decorator to check file existence before function execution.
+# *args and **kwargs allow it to be used with any function.
+def ensure_file_exists(func):
+    def wrapper(*args, **kwargs):
+        if not os.path.exists("data/wines.txt"):
+            print("File 'data/wines.txt' does not exist.")
+            return
+        return func(*args, **kwargs)
+    return wrapper
+
+@ensure_file_exists
 def register_wine():
-    try:
-        if not file_exists("data/wines.txt"):
-            print("File 'data/wines.txt' does not exist.")
-            return
-        
-        code = input("Enter the code of the wine: ")
-        name = input("Enter the name of the wine: ")
-        wine_type = input("Enter the type of the wine: ")
-        alcohol_content = float(input("Enter the alcohol content of the wine: "))
-        price = float(input("Enter the price of the wine: "))
+    code = input("Enter the code of the wine: ")
+    name = input("Enter the name of the wine: ")
+    wine_type = input("Enter the type of the wine: ")
+    alcohol_content = float(input("Enter the alcohol content of the wine: "))
+    price = float(input("Enter the price of the wine: "))
 
-        new_wine = f"{code},{name},{wine_type},{alcohol_content},{price}"
+    new_wine = Wine(code, name, wine_type, alcohol_content, price)
 
-        with open("data/wines.txt", "a") as file:
-            file.write(new_wine + "\n")
+    with open("data/wines.txt", "a") as file:
+        file.write(f"{new_wine.code},{new_wine.name},{new_wine.type},{new_wine.alcohol_content},{new_wine.price}\n")
 
-        print("Wine registered successfully!")
-    except ValueError:
-        print("Invalid input. Please enter a valid number for alcohol content and price.")
+    print("Wine registered successfully!")
 
-
+@ensure_file_exists
 def list_wines():
-    try:
-        with open("data/wines.txt", "r") as file:
-            print("=== List of Wines ===")
-            print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
-            print("-" * 60)
-            for line in file:
-                wine_data = line.strip().split(",")
-                if len(wine_data) >= 5:
-                    code, name, wine_type, alcohol_content, price = wine_data[:5]
-                    print(f"{code}\t{name.ljust(20)}\t{wine_type}\t{alcohol_content}%\t\tR${price}")
-                else:
-                    print(f"Invalid data: {line.strip()}")
-            print("-" * 60)
-    except FileNotFoundError:
-        print("No wines found. Please register some wines first.")
+    with open("data/wines.txt", "r") as file:
+        print("=== List of Wines ===")
+        print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
+        print("-" * 60)
+        for line in file:
+            wine_data = line.strip().split(",")
+            if len(wine_data) >= 5:
+                wine = Wine(*wine_data[:5])
+                print(wine)
+            else:
+                print(f"Invalid data: {line.strip()}")
+        print("-" * 60)
 
-
-
+@ensure_file_exists
 def update_wine(code, new_name=None, new_type=None, new_alcohol_content=None, new_price=None):
-    try:
-        if not file_exists("data/wines.txt"):
-            print("File 'data/wines.txt' does not exist.")
-            return
-        
-        with open("data/wines.txt", "r") as file:
-            wines = file.readlines()
+    with open("data/wines.txt", "r") as file:
+        wines = [Wine(*line.strip().split(",")) for line in file]
 
-        wine_index = None
-        for index, wine in enumerate(wines):
-            if wine.split(",")[0] == code:
-                wine_index = index
-                break
-
-        if wine_index is not None:
-            current_wine = wines[wine_index].strip().split(",")
-
+    for wine in wines:
+        if wine.code == code:
             if new_name:
-                current_wine[1] = new_name
+                wine.name = new_name
             if new_type:
-                current_wine[2] = new_type
+                wine.type = new_type
             if new_alcohol_content:
-                current_wine[3] = new_alcohol_content
+                wine.alcohol_content = new_alcohol_content
             if new_price:
-                current_wine[4] = new_price
-
-            updated_wine = ",".join(current_wine) + "\n"
-
-            wines[wine_index] = updated_wine
+                wine.price = new_price
 
             with open("data/wines.txt", "w") as file:
-                file.writelines(wines)
+                file.writelines(f"{wine.code},{wine.name},{wine.type},{wine.alcohol_content},{wine.price}\n" for wine in wines)
 
             print("Wine updated successfully!")
-        else:
-            print("Wine not found with the provided code.")
-    except FileNotFoundError:
-        print("No wines found. Please register some wines first.")
+            return
 
+    print("Wine not found with the provided code.")
 
+@ensure_file_exists
 def delete_wine(code):
-    try:
-        if not file_exists("data/wines.txt"):
-            print("File 'data/wines.txt' does not exist.")
-            return
-        
-        with open("data/wines.txt", "r") as file:
-            wines = file.readlines()
+    with open("data/wines.txt", "r") as file:
+        wines = [Wine(*line.strip().split(",")) for line in file]
 
-        wine_found = False
-        for index, wine in enumerate(wines):
-            if wine.split(",")[0] == code:
-                wine_found = True
-                wine_info = wine.strip().split(",")
-                print("=== Wine Found ===")
-                print("Code:", wine_info[0])
-                print("Name:", wine_info[1])
-                print("Type:", wine_info[2])
-                print("Alcohol Content:", wine_info[3])
-                print("Price:", wine_info[4])
-                while True:
-                    confirmation = input("Are you sure you want to delete this wine? (1 - Yes, 2 - No): ")
-                    if confirmation == "1":
-                        wines[index] = "" 
-                        with open("data/wines.txt", "w") as file:
-                            file.writelines(wines)
-                        print("Wine deleted successfully!")
-                        break
-                    elif confirmation == "2":
-                        print("Deletion canceled.")
-                        break
-                    else:
-                        print("Invalid input. Please enter 1 for Yes or 2 for No.")
-                break
+    for wine in wines:
+        if wine.code == code:
+            print("=== Wine Found ===")
+            print(wine)
+            confirmation = input("Are you sure you want to delete this wine? (1 - Yes, 2 - No): ")
+            if confirmation == "1":
+                wines.remove(wine)
+                with open("data/wines.txt", "w") as file:
+                    file.writelines(f"{wine.code},{wine.name},{wine.type},{wine.alcohol_content},{wine.price}\n" for wine in wines)
+                print("Wine deleted successfully!")
+                return
+            elif confirmation == "2":
+                print("Deletion canceled.")
+                return
+            else:
+                print("Invalid input. Please enter 1 for Yes or 2 for No.")
+                return
 
-        if not wine_found:
-            print("Wine not found with the provided code.")
-    except FileNotFoundError:
-        print("No wines found. Please register some wines first.")
+    print("Wine not found with the provided code.")
 
-
+@ensure_file_exists
 def search_wine(value):
-    try:
-        if not file_exists("data/wines.txt"):
-            print("File 'data/wines.txt' does not exist.")
-            return
-        
-        search_results = []
-        with open("data/wines.txt", "r") as file:
-            for line in file:
-                try:
-                    code, name, wine_type, alcohol_content, price = line.strip().split(",")
-                    if value.lower() in (name.lower(), wine_type.lower()):
-                        search_results.append((code, name, wine_type, alcohol_content, price))
-                    elif value.isdigit() and any(field == float(value) for field in (alcohol_content, price)):
-                        search_results.append((code, name, wine_type, alcohol_content, price))
-                except ValueError:
-                    pass
+    with open("data/wines.txt", "r") as file:
+        wines = [Wine(*line.strip().split(",")) for line in file]
 
-        if search_results:
-            print("=== Search Results ===")
-            print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
-            print("-" * 60)
-            for result in search_results:
-                print("\t".join(result))
-            print("-" * 60)
-        else:
-            print("No wines found matching the search criteria.")
-    except FileNotFoundError:
-        print("No wines found. Please register some wines first.")
+    search_results = [wine for wine in wines if value.lower() in (wine.name.lower(), wine.type.lower())]
+
+    if search_results:
+        print("=== Search Results ===")
+        print("Code\tName\t\t\tType\tAlcohol Content\tPrice")
+        print("-" * 60)
+        for wine in search_results:
+            print(wine)
+        print("-" * 60)
+    else:
+        print("No wines found matching the search criteria.")
