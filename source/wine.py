@@ -26,8 +26,10 @@ def register_wine():
     code = input("Enter the code of the wine: ")
     name = input("Enter the name of the wine: ")
     wine_type = input("Enter the type of the wine: ")
-    alcohol_content = float(input("Enter the alcohol content of the wine: "))
     price = float(input("Enter the price of the wine: "))
+    price = '{:.2f}'.format(price)
+    alcohol_content = float(input("Enter the alcohol content of the wine (%): "))
+    alcohol_content = '{:.1f}%'.format(alcohol_content)
 
     new_wine = Wine(code, name, wine_type, alcohol_content, price)
 
